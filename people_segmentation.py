@@ -10,8 +10,8 @@ from pathlib import Path
 
 
 def segment_people(image, masks, class_ids):
-    # Create a new solid-black image the same size as the original image
-    masked = np.zeros(image.shape)
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    masked = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
     # Loop over each detected object's mask
     for i in range(masks.shape[2]):
@@ -22,8 +22,8 @@ def segment_people(image, masks, class_ids):
         # Draw the mask for the current object in white
         mask = masks[:, :, i]
         color = tuple(np.random.randint(256, size=3))
-
-        masked = mrcnn.visualize.apply_mask(masked, mask, color, alpha=1.0)
+        # color = mrcnn.visualize.random_colors(3)
+        masked = mrcnn.visualize.apply_mask(masked, mask, color=color, alpha=1.0)
 
     return masked.astype(np.uint8)
 
@@ -55,26 +55,24 @@ model = MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=MaskRCNNConfig())
 # Load pre-trained model
 model.load_weights(weights, by_name=True)
 
-for i in range(8, 5001):
+for i in range(0, 5001):
 
     filename = str(i).zfill(4) + ".jpg"
     # Load the image we want to run detection on
     image_path = str(ROOT_DIR / "val2017" / filename)
     image = cv2.imread(image_path)
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    gray = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
 
     # Convert the image from BGR color (which OpenCV uses) to RGB color
     rgb_image = image[:, :, ::-1]
 
     # Run the image through the model
     results = model.detect([rgb_image], verbose=1)
-
+    # print(i)
     # Visualize results
     r = results[0]
     masked_image = segment_people(rgb_image, r['masks'], r['class_ids'])
 
     # Show the result on the screen
-    # plt.imshow(masked_image.astype(np.uint8))
-    # plt.show()
-    cv2.imwrite("output/" + filename, gray+masked_image.astype(np.uint8))
+    plt.imshow(masked_image.astype(np.uint8))
+    plt.show()
+    # cv2.imwrite("output/" + filename, masked_image)
