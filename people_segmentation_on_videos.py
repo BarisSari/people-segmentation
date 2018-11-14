@@ -55,7 +55,7 @@ model = MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=MaskRCNNConfig())
 # Load pre-trained model
 model.load_weights(weights, by_name=True)
 
-input_video = 'demo/1.mp4'
+input_video = 'input_video.MOV'
 capture = cv2.VideoCapture(input_video)
 fps = 25.0
 width = int(capture.get(3))
