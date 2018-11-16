@@ -3,14 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import mrcnn.config
-import mrcnn.visualize as visualize
 import mrcnn.utils
 from mrcnn.model import MaskRCNN
 from pathlib import Path
 from matplotlib import pyplot as plt
 from matplotlib import patches
 import random
-from matplotlib.patches import Polygon
 import colorsys
 
 
@@ -89,8 +87,7 @@ def display_instances(image, boxes, masks, class_ids, class_names, scores=None, 
     else:
         assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
 
-    # If no axis is passed, create one and automatically call show()
-    f, ax = plt.subplots(1, figsize=(16, 16))
+    f, ax = plt.subplots(1, figsize=(10.8, 19.2))
 
     # Generate random colors
     colors = colors or random_colors(N)
@@ -110,7 +107,6 @@ def display_instances(image, boxes, masks, class_ids, class_names, scores=None, 
             # Skip this instance. Has no bbox. Likely lost in image cropping.
             continue
         y1, x1, y2, x2 = boxes[i]
-
         p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=4,
                               alpha=0.7, linestyle="dashed",
                               edgecolor=color, facecolor='none')
@@ -119,12 +115,11 @@ def display_instances(image, boxes, masks, class_ids, class_names, scores=None, 
         score = scores[i] if scores is not None else None
         label = class_names[class_id]
         caption = "{} {:.3f}".format(label, score) if score else label
-
         ax.text(x1, y1-4, caption, color='w', size=13, backgroundcolor=color)
 
     ax.imshow(masked_image.astype(np.uint8))
-    plt.show()
-    # f.savefig('output3.jpg')
+    # plt.show()
+    f.savefig('output3.jpg', dpi=100)
 
 # used to test whether detection works or no
 # for i in range(0, 1):
